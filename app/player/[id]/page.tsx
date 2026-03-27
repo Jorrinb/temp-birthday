@@ -8,14 +8,6 @@ import ProgressBar from "@/components/ProgressBar";
 import Leaderboard from "@/components/Leaderboard";
 import type { Player, ChecklistEntry } from "@/lib/types";
 
-// Category display order + labels
-const CATEGORY_ORDER = ["Club", "Karaoke", "Core Memory", "Funny"];
-const CATEGORY_EMOJI: Record<string, string> = {
-  Club: "🎉",
-  Karaoke: "🎤",
-  "Core Memory": "📸",
-  Funny: "😂",
-};
 
 export default function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -26,7 +18,6 @@ export default function PlayerPage({ params }: { params: Promise<{ id: string }>
   const [playerError, setPlayerError] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [togglingId, setTogglingId] = useState<number | null>(null);
-
   const { items, loading, optimisticToggle, refetch } = useChecklist(playerId);
 
   // Fetch player info once
@@ -65,27 +56,6 @@ export default function PlayerPage({ params }: { params: Promise<{ id: string }>
     }
   }
 
-  // Group items by category in the defined order
-  function groupByCategory(items: ChecklistEntry[]): [string, ChecklistEntry[]][] {
-    const grouped: Record<string, ChecklistEntry[]> = {};
-    for (const item of items) {
-      if (!grouped[item.category]) grouped[item.category] = [];
-      grouped[item.category].push(item);
-    }
-
-    const ordered: [string, ChecklistEntry[]][] = [];
-    // First render categories in the defined order
-    for (const cat of CATEGORY_ORDER) {
-      if (grouped[cat]?.length) ordered.push([cat, grouped[cat]]);
-    }
-    // Then any extra categories not in the predefined order
-    for (const cat of Object.keys(grouped)) {
-      if (!CATEGORY_ORDER.includes(cat)) ordered.push([cat, grouped[cat]]);
-    }
-    return ordered;
-  }
-
-  const grouped = groupByCategory(items);
   const completedCount = items.filter((i) => i.is_completed).length;
   const totalCount = items.length;
 
@@ -173,33 +143,18 @@ export default function PlayerPage({ params }: { params: Promise<{ id: string }>
           </div>
         )}
 
-        {!loading &&
-          grouped.map(([category, categoryItems]) => (
-            <div key={category} className="bg-black border border-[#8b1a4a] rounded-2xl shadow-[0_0_12px_rgba(139,26,74,0.15)] overflow-hidden">
-              {/* Category header */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-[#8b1a4a]/20">
-                <span className="text-base">{CATEGORY_EMOJI[category] ?? "📌"}</span>
-                <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
-                  {category}
-                </h2>
-                <span className="ml-auto text-xs text-gray-600">
-                  {categoryItems.filter((i) => i.is_completed).length}/{categoryItems.length}
-                </span>
-              </div>
-
-              {/* Items */}
-              <div className="px-3 py-2.5 space-y-2">
-                {categoryItems.map((item) => (
-                  <ChecklistItem
-                    key={item.id}
-                    item={item}
-                    onToggle={handleToggle}
-                    disabled={togglingId === item.id}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
+        {!loading && items.length > 0 && (
+          <div className="bg-black border border-[#8b1a4a] rounded-2xl shadow-[0_0_12px_rgba(139,26,74,0.15)] px-3 py-3 space-y-2">
+            {items.map((item) => (
+              <ChecklistItem
+                key={item.id}
+                item={item}
+                onToggle={handleToggle}
+                disabled={togglingId === item.id}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Polling note */}
         <p className="text-gray-700 text-xs text-center pb-4">

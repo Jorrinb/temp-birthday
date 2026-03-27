@@ -83,16 +83,6 @@ export default function ChecklistItem({ item, onToggle, disabled }: ChecklistIte
         >
           {item.title}
         </p>
-        {item.description && (
-          <p
-            className={`
-              text-xs mt-0.5 transition-all duration-200
-              ${item.is_completed ? "text-gray-600 line-through" : "text-gray-500"}
-            `}
-          >
-            {item.description}
-          </p>
-        )}
         {item.is_completed && item.completed_at && (
           <p className="text-xs text-[#8b1a4a] mt-1">
             ✓ Done at{" "}
