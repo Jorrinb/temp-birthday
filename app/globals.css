@@ -2,16 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Zebra background ─────────────────────────────────────────────────────── */
+/* ─── Background image ─────────────────────────────────────────────────────── */
 body {
   background-color: #0d0d0d;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    #0d0d0d 0px,
-    #0d0d0d 12px,
-    #141414 12px,
-    #141414 24px
-  );
+  background-image: url('/images/O6YCRI0.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   min-height: 100dvh;
   color: #e5e7eb; /* gray-200 */
 }

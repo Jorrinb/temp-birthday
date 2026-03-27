@@ -63,7 +63,6 @@ function SortableActivityRow({
 
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-200 truncate">{activity.title}</p>
-        <p className="text-xs text-[#8b1a4a]">{activity.category}</p>
       </div>
 
       <button
@@ -84,20 +83,16 @@ function SortableActivityRow({
 
 // ─── Activity form (add or edit) ──────────────────────────────────────────────
 
-const CATEGORIES = ["Club", "Karaoke", "Core Memory", "Funny"];
-
 function ActivityForm({
   initial,
   onSave,
   onCancel,
 }: {
   initial?: Partial<Activity>;
-  onSave: (data: { title: string; description: string; category: string }) => Promise<void>;
+  onSave: (data: { title: string }) => Promise<void>;
   onCancel: () => void;
 }) {
   const [title, setTitle] = useState(initial?.title ?? "");
-  const [description, setDescription] = useState(initial?.description ?? "");
-  const [category, setCategory] = useState(initial?.category ?? "Club");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,7 +102,7 @@ function ActivityForm({
     setLoading(true);
     setError(null);
     try {
-      await onSave({ title: title.trim(), description: description.trim(), category });
+      await onSave({ title: title.trim() });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error saving");
     } finally {
@@ -129,25 +124,6 @@ function ActivityForm({
         className={inputClass}
         autoFocus
       />
-      <input
-        type="text"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Short description (optional)"
-        maxLength={150}
-        className={inputClass}
-      />
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className={inputClass + " cursor-pointer"}
-      >
-        {CATEGORIES.map((c) => (
-          <option key={c} value={c} className="bg-gray-950">
-            {c}
-          </option>
-        ))}
-      </select>
       {error && <p className="text-red-400 text-xs">{error}</p>}
       <div className="flex gap-2">
         <button
@@ -251,19 +227,19 @@ export default function ManagementPanel({ onClose, onPlayersChanged }: Managemen
 
   // ── Activities CRUD ─────────────────────────────────────────────────────────
 
-  async function addActivity(data: { title: string; description: string; category: string }) {
+  async function addActivity(data: { title: string }) {
     const nextOrder = activities.length > 0 ? Math.max(...activities.map((a) => a.sort_order)) + 1 : 1;
     const res = await fetch("/api/activities", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data, sort_order: nextOrder }),
+      body: JSON.stringify({ ...data, category: "General", sort_order: nextOrder }),
     });
     if (!res.ok) throw new Error("Failed to add activity");
     await fetchActivities();
     setShowAddActivity(false);
   }
 
-  async function saveActivityEdit(data: { title: string; description: string; category: string }) {
+  async function saveActivityEdit(data: { title: string }) {
     if (!editingActivity) return;
     const res = await fetch(`/api/activities/${editingActivity.id}`, {
       method: "PATCH",
