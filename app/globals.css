@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Zebra background ─────────────────────────────────────────────────────── */
+body {
+  background-color: #0d0d0d;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #0d0d0d 0px,
+    #0d0d0d 12px,
+    #141414 12px,
+    #141414 24px
+  );
+  min-height: 100dvh;
+  color: #e5e7eb; /* gray-200 */
+}
+
+/* ─── Scrollbar styling ────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0d0d;
+}
+::-webkit-scrollbar-thumb {
+  background: #8b1a4a;
+  border-radius: 2px;
+}
+
+/* ─── Custom checkPop keyframe (referenced in Tailwind config) ─────────────── */
+@keyframes checkPop {
+  0%   { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+/* ─── iOS safe-area padding ────────────────────────────────────────────────── */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
